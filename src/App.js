@@ -23,6 +23,7 @@ import * as widgets from "surveyjs-widgets";
 // form json
 import { waco } from './forms/waco'
 import { columbus } from './forms/columbus'
+import { pittsburgh } from './forms/pittsburgh'
 
 widgets.icheck(Survey, $);
 widgets.select2(Survey, $);
@@ -65,6 +66,7 @@ class App extends Component {
           <h2>Welcome to React with SurveyJS</h2>
           <button onClick={() => this.setState({json: waco})}>waco</button>
           <button onClick={() => this.setState({json: columbus})}>columbus</button>
+          <button onClick={() => this.setState({json: pittsburgh})}>pittsburgh</button>
         </div>
         <div className="surveyjs">
           {/*If you want to show survey, uncomment the line below*/}
