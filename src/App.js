@@ -24,6 +24,8 @@ import * as widgets from "surveyjs-widgets";
 import { waco } from './forms/waco'
 import { columbus } from './forms/columbus'
 import { pittsburgh } from './forms/pittsburgh'
+import PersonalInfo from './blocks/personal-info'
+import Appearance from './blocks/appearance'
 
 widgets.icheck(Survey, $);
 widgets.select2(Survey, $);
@@ -40,7 +42,7 @@ widgets.bootstrapslider(Survey);
 
 class App extends Component {
   state = {
-    json: waco
+    json: {pages: [PersonalInfo, Appearance]}
   }
 
   componentWillMount() {
@@ -57,6 +59,7 @@ class App extends Component {
   }
 
   render() {
+    console.log(PersonalInfo)
     Survey.Survey.cssType = "bootstrap";
     var model = new Survey.Model(this.state.json);
     return (
