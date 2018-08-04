@@ -1,153 +1,181 @@
 import { states } from './constants'
+import { zip as zipcode, ssn as ss } from './validators'
 
-// TODO visibleIf: '{question29} = \'item1\''
+class Block {
+  constructor () {
+    this.block = {}
+  }
 
-export function titleToName (title) {
-  return title.replace(/[^\d\w\s-_]/g, '').toLowerCase().split(' ').join('-')
-}
+  clear () {
+    this.block = {}
+  }
 
-export function phone (title, isRequired = false) {
-  return {
-    type: 'text',
-    name: titleToName(title),
-    title: 'Primary Phone',
-    inputType: 'tel',
-    inputFormat: '(999) 999-9999',
-    isRequired
+  getBlock () {
+    return this.block
+  }
+
+  create (title) {
+    let block = this.getBlock()
+    this.clear()
+    console.log('after clear', block)
+    block.title = title
+    block.name = this.titleToName(title)
+    return block
+  }
+
+  required () {
+    this.block.isRequired = true
+    return this
+  }
+
+  visibleWhen (title, value) {
+    this.block.visibleIf = `{${this.titleToName(title)}} = '${value}'`
+    return this
+  }
+
+  sameLine () {
+    this.block.startWithNewLine = false
+    return this
+  }
+
+  setTitle (title) {
+    this.block.title = title
+  }
+
+  setName (name) {
+    this.block.name = name
+  }
+
+  titleToName (title) {
+    return title.replace(/[^\d\w\s-_]/g, '').toLowerCase().split(' ').join('-')
+  }
+
+  getOptions (options) {
+    return options.map(opt => { return {value: this.titleToName(opt), text: opt} })
   }
 }
 
-export function state () {
-  return {
-    type: 'dropdown',
-    name: 'state',
-    title: 'State',
-    choices: getStatesArray()
+export let block = new Block()
+
+class Text extends Block {
+  create (title) {
+    this.block.type = 'text'
+    return super.create(title)
   }
 }
+export let text = new Text()
 
-export function zip () {
-  return {
-    type: 'text',
-    name: 'zip',
-    title: 'Zip',
-    validators: [
-      {
-        type: 'regex',
-        text: 'Zip',
-        regex: '[0-9]{5}(?:[- ][0-9]{4})?'
-      }
+class NumberField extends Block {
+  create (title) {
+    this.block.type = 'text'
+    this.block.inputType = 'number'
+    return super.create(title)
+  }
+}
+export let number = new NumberField()
+
+class Phone extends Block {
+  create (title) {
+    this.block.type = 'text'
+    this.block.inputType = 'tel'
+    this.block.inputFormat = '(999) 999-9999'
+    return super.create(title)
+  }
+}
+export let phone = new Phone()
+
+class Address extends Block {
+  create (title) {
+    this.block.type = 'panel'
+    this.block.elements = [
+      text.create('Address Line 1'), // required
+      text.create('Address Line 2'),
+      text.create('City'), // required
+      state.create(),
+      zip.create()
     ]
+    return super.create(title)
+  }
+}
+export let address = new Address()
+
+class States extends Block {
+  create (title = 'States') {
+    this.block.type = 'dropdown'
+    this.block.choices = this.getStatesArray()
+    return super.create(title)
+  }
+
+  getStatesArray () {
+    return Object.keys(states).map((abbr) => {
+      return {value: states[abbr], text: abbr}
+    })
   }
 }
 
-export function getStatesArray () {
-  return Object.keys(states).map((abbr) => {
-    return {value: states[abbr], text: abbr}
-  })
-}
+export let state = new States()
 
-export function address (name, title) {
-  return {
-    type: 'panel',
-    name,
-    title,
-    elements: [
-      text('Address Line 1', true),
-      text('Address Line 2', true),
-      text('City', true),
-      state(),
-      zip()
-    ]
+class ZipCode extends Block {
+  create (title = 'Zip') {
+    this.block.type = 'text'
+    this.block.validators = [zipcode]
+    return super.create(title)
+  }
+}
+export let zip = new ZipCode()
+
+class SSN extends Block {
+  create (title = 'SSN') {
+    this.block.type = 'text'
+    this.block.inputFormat = '999-99-9999'
+    this.block.validators = [ss]
+    return super.create(title)
+  }
+}
+export let ssn = new SSN()
+
+class DateField extends Block {
+  create (title) {
+    this.block.type = 'text'
+    this.block.inputType = 'date'
+    return super.create(title)
+  }
+}
+export let date = new DateField()
+
+class RadioGroup extends Block {
+  create (title, options) {
+    this.block.type = 'radiogroup'
+    this.block.choices = this.getOptions(options)
+    return super.create(title)
+  }
+}
+export let radioGroup = new RadioGroup()
+
+class DropDown extends Block {
+  create (title, options) {
+    this.block.type = 'dropdown'
+    this.block.choices = this.getOptions(options)
+    return super.create(title)
+  }
+}
+export let dropdown = new DropDown()
+
+class FileUpload extends Block {
+  create (title) {
+    this.block.type = 'file'
+    this.block.showPreview = true
+    this.block.maxSize = 0
+    return super.create(title)
+  }
+
+  showPreview (bool) {
+    this.block.showPreview = bool
+  }
+
+  maxSize (size) {
+    this.block.maxSize = size
   }
 }
 
-export function ssn (title, isRequired = false) {
-  return {
-    type: 'text',
-    name: titleToName(title),
-    title,
-    isRequired,
-    validators: [
-      {
-        type: 'regex',
-        text: 'SSN',
-        regex: '[0-9]{3}-[0-9]{2}-[0-9]{4}'
-      }
-    ]
-  }
-}
-
-export function text (title, isRequired = false) {
-  return {
-    type: 'text',
-    name: titleToName(title),
-    title,
-    isRequired
-  }
-}
-
-export function number (title, isRequired) {
-  return {
-    type: 'text',
-    name: titleToName(title),
-    title,
-    inputType: 'number',
-    isRequired
-  }
-}
-
-export function date (title, isRequired = false) {
-  return {
-    type: 'text',
-    name: titleToName(title),
-    title,
-    inputType: 'date',
-    isRequired
-  }
-}
-
-export function radioGroup (title, options, isRequired = false) {
-  return {
-    type: 'radiogroup',
-    name: titleToName(title),
-    title: title,
-    choices: getOptions(options),
-    isRequired
-  }
-}
-
-export function file (title, isRequired = false) {
-  return {
-    type: 'file',
-    name: titleToName(title),
-    title,
-    isRequired,
-    showPreview: true,
-    maxSize: 0
-  }
-}
-
-export function sameLine (block) {
-  block.startWithNewLine = false
-  return block
-}
-
-export function visibleIf (title, value, block) {
-  block.visibleIf = `{${titleToName(title)}} = '${value}'`
-  return block
-}
-
-export function dropdown (title, options, isRequired) {
-  return {
-    type: 'dropdown',
-    name: titleToName(title),
-    title,
-    choices: getOptions(options),
-    isRequired
-  }
-}
-
-export function getOptions (options) {
-  return options.map(opt => { return {value: titleToName(opt), text: opt} })
-}
+export let file = new FileUpload()

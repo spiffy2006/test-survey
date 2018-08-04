@@ -1,14 +1,14 @@
-import { file, number, dropdown, sameLine } from './blocks'
+import { file, number, dropdown } from './blocks'
 import { hairColors, eyeColors } from './constants'
 
 export const Info = [
-  file('Current Picture', true),
-  dropdown('Hair Color', hairColors, true),
-  dropdown('Eye Color', eyeColors, true),
-  number('Height', true),
-  sameLine(dropdown('Height Unit', ['inches', 'cm'])),
-  number('Weight', true),
-  sameLine(dropdown('Weight Unit', ['lbs', 'kg']))
+  file.create('Current Picture'), // required
+  dropdown.create('Hair Color', hairColors), // required
+  dropdown.create('Eye Color', eyeColors), // required
+  number.create('Height'), // required
+  dropdown.sameLine().create('Height Unit', ['inches', 'cm']), // same line
+  number.create('Weight'), // required
+  dropdown.sameLine().create('Weight Unit', ['lbs', 'kg']) // same line
 ]
 
 const Appearance = {

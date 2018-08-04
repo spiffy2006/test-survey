@@ -26,6 +26,7 @@ import { columbus } from './forms/columbus'
 import { pittsburgh } from './forms/pittsburgh'
 import PersonalInfo from './blocks/personal-info'
 import Appearance from './blocks/appearance'
+import { block, text } from './blocks/blocks'
 
 widgets.icheck(Survey, $);
 widgets.select2(Survey, $);
@@ -39,6 +40,9 @@ widgets.sortablejs(Survey);
 widgets.ckeditor(Survey);
 widgets.autocomplete(Survey, $);
 widgets.bootstrapslider(Survey);
+
+console.log('new block', block.required().sameLine().create('does this work?'))
+console.log('new block', text.sameLine().create('will dis work?'))
 
 class App extends Component {
   state = {
