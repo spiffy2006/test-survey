@@ -124,6 +124,13 @@ class AddressHistory extends Block {
 }
 export let addressHistory = new AddressHistory()
 
+class BusinessHistory extends Block {
+  create (title) {
+    return dynamicPanel.create(title, [text.create('Business Name'), ...getAddressBlocks(), date.create('From'), date.create('To')])
+  }
+}
+export let businessHistory = new BusinessHistory()
+
 class States extends Block {
   create (title = 'States') {
     this.block.type = 'dropdown'
