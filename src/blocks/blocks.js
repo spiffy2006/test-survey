@@ -17,7 +17,6 @@ class Block {
   create (title) {
     let block = this.getBlock()
     this.clear()
-    console.log('after clear', block)
     block.title = title
     block.name = this.titleToName(title)
     return block
@@ -57,6 +56,24 @@ class Block {
 
 export let block = new Block()
 
+class Panel extends Block {
+  create (title, elements) {
+    this.block.type = 'panel'
+    this.block.elements = elements
+    return super.create(title)
+  }
+}
+export let panel = new Panel()
+
+class DynamicPanel extends Block {
+  create (title, elements) {
+    this.block.type = 'paneldynamic'
+    this.block.templateElements = elements
+    return super.create(title)
+  }
+}
+export let dynamicPanel = new DynamicPanel()
+
 class Text extends Block {
   create (title) {
     this.block.type = 'text'
@@ -84,20 +101,28 @@ class Phone extends Block {
 }
 export let phone = new Phone()
 
+function getAddressBlocks () {
+  return [
+    text.create('Address Line 1'), // required
+    text.create('Address Line 2'),
+    text.create('City'), // required
+    state.create(), // required
+    zip.create() // required
+  ]
+}
 class Address extends Block {
   create (title) {
-    this.block.type = 'panel'
-    this.block.elements = [
-      text.create('Address Line 1'), // required
-      text.create('Address Line 2'),
-      text.create('City'), // required
-      state.create(),
-      zip.create()
-    ]
-    return super.create(title)
+    return panel.create(title, getAddressBlocks())
   }
 }
 export let address = new Address()
+
+class AddressHistory extends Block {
+  create (title) {
+    return dynamicPanel.create(title, [...getAddressBlocks(), date.create('From'), date.create('To')])
+  }
+}
+export let addressHistory = new AddressHistory()
 
 class States extends Block {
   create (title = 'States') {
