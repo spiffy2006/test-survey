@@ -1,4 +1,4 @@
-import { address, phone, ssn, text, date, radioGroup } from './blocks'
+import { page, address, phone, ssn, text, date, radioGroup } from './blocks'
 export const Info = [
   text.create('First Name'), // required
   text.create('Middle Name'),
@@ -13,10 +13,6 @@ export const Info = [
   radioGroup.create('Are you a US Citizen?', ['Yes', 'No']) // required
 ]
 
-const PersonalInfo = {
-  name: 'personal-info',
-  title: 'Personal Info',
-  elements: Info
-}
+const PersonalInfo = page.create('Personal Info', Info)
 
 export default PersonalInfo

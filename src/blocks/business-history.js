@@ -1,11 +1,7 @@
-import { businessHistory } from './blocks'
+import { page, businessHistory } from './blocks'
 
 export const Info = [businessHistory.create('Business History')]
 
-const BusinessHistory = {
-  name: 'business-history',
-  title: 'Business History',
-  elements: Info
-}
+const BusinessHistory = page.create('Business History', Info)
 
 export default BusinessHistory

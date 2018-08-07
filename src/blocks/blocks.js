@@ -211,3 +211,11 @@ class FileUpload extends Block {
 }
 
 export let file = new FileUpload()
+
+class Page extends Block {
+  create (title, elements) {
+    this.block.elements = elements
+    return super.create(title)
+  }
+}
+export let page = new Page()

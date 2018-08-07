@@ -1,4 +1,4 @@
-import { file, number, dropdown } from './blocks'
+import { page, file, number, dropdown } from './blocks'
 import { hairColors, eyeColors } from './constants'
 
 export const Info = [
@@ -11,10 +11,6 @@ export const Info = [
   dropdown.sameLine().create('Weight Unit', ['lbs', 'kg']) // same line
 ]
 
-const Appearance = {
-  name: 'appearance',
-  title: 'Appearance',
-  elements: Info
-}
+const Appearance = page.create('Appearance', Info)
 
 export default Appearance

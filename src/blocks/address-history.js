@@ -1,11 +1,7 @@
-import { addressHistory } from './blocks'
+import { page, addressHistory } from './blocks'
 
 export const Info = [addressHistory.create('Address History')]
 
-const AddressHistory = {
-  name: 'address-history',
-  title: 'Address History',
-  elements: Info
-}
+const AddressHistory = page.create('Address History', Info)
 
 export default AddressHistory
