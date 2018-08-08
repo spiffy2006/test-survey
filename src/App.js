@@ -28,6 +28,7 @@ import PersonalInfo from './blocks/personal-info'
 import Appearance from './blocks/appearance'
 import AddressHistory from './blocks/address-history'
 import BusinessHistory from './blocks/business-history'
+import BusinessInfo from './blocks/business-info'
 
 widgets.icheck(Survey, $);
 widgets.select2(Survey, $);
@@ -44,7 +45,7 @@ widgets.bootstrapslider(Survey);
 
 class App extends Component {
   state = {
-    json: {pages: [PersonalInfo, Appearance, AddressHistory, BusinessHistory]}
+    json: {pages: [PersonalInfo, Appearance, AddressHistory, BusinessHistory, BusinessInfo]}
   }
 
   componentWillMount() {
