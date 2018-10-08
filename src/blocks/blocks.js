@@ -213,9 +213,25 @@ class FileUpload extends Block {
 export let file = new FileUpload()
 
 class Page extends Block {
-  create (title, elements) {
+  create (title, elements, defaultValue = null) {
     this.block.elements = elements
+    if (defaultValue) {
+      this.block.defaultValue = defaultValue
+    }
     return super.create(title)
   }
 }
 export let page = new Page()
+
+export function mapDefaultValuesToPage (defaults, page) {
+  let { elements } = page
+  let recurse = (el) => {
+    if (el.elements) {
+      el.elements = el.elements.map(recurse)
+    }
+    el.defaultValue = defaults[el.name]
+    return el
+  }
+  page.elements = elements.map(recurse)
+  return page
+}

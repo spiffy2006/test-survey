@@ -1,7 +1,11 @@
 import React, { Component } from "react";
+import Auth from './services/auth/auth'
 import * as Survey from "survey-react";
 import "survey-react/survey.css";
 import SurveyEditor from "./SurveyEditor";
+import Callback from './components/Callback'
+import { mapDefaultValuesToPage } from './blocks/blocks'
+import Header from './components/Header'
 import logo from "./logo.svg";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.css";
@@ -21,9 +25,9 @@ import "jquery-bar-rating";
 import * as widgets from "surveyjs-widgets";
 
 // form json
-import { waco } from './forms/waco'
-import { columbus } from './forms/columbus'
-import { pittsburgh } from './forms/pittsburgh'
+// import { waco } from './forms/waco'
+// import { columbus } from './forms/columbus'
+// import { pittsburgh } from './forms/pittsburgh'
 import PersonalInfo from './blocks/personal-info'
 import Appearance from './blocks/appearance'
 import AddressHistory from './blocks/address-history'
@@ -43,25 +47,105 @@ widgets.ckeditor(Survey);
 widgets.autocomplete(Survey, $);
 widgets.bootstrapslider(Survey);
 
+const auth = new Auth()
+const defaults = {
+  "address-line-1": "1313 Fake Pl",
+  "address-line-2": "APT 34",
+  "are-you-a-us-citizen": "yes",
+  "city": "O-town",
+  "date-of-birth": "2018-10-05",
+  "drivers-license-number": "1234567",
+  "first-name": "John",
+  "last-name": "Doe",
+  "middle-name": "D",
+  "place-of-birth": "Nebulous Galaxy",
+  "primary-phone": "(555) 555-5555",
+  "secondary-phone": "(555) 555-5555",
+  "ssn": "555-55-5555",
+  "states": "Maine",
+  "zip": "90210"
+}
+// todo figure out default values
 class App extends Component {
   state = {
-    json: {pages: [PersonalInfo, Appearance, AddressHistory, BusinessHistory, BusinessInfo]}
+    authed: auth.isAuthenticated(),
+    loading: false,
+    json: {pages: [mapDefaultValuesToPage(defaults, PersonalInfo)]}
   }
+  blocks = {PersonalInfo, Appearance, AddressHistory, BusinessHistory, BusinessInfo}
 
   componentWillMount() {
     import("icheck");
     window["$"] = window["jQuery"] = $;
+    if (!auth.isAuthenticated()) {
+      this.handleAuthentication()
+    }
+    console.log('personal info', PersonalInfo)
   }
 
   onValueChanged(result) {
-    console.log("value changed!");
+    console.log("value changed!", result);
   }
 
   onComplete(result) {
-    console.log("Complete! " + result);
+    console.log("Complete! ", result);
   }
 
-  render() {
+  getLoading() {
+    return (<Callback />)
+  }
+
+  getLogin() {
+    return null
+  }
+
+  handleAuthentication() {
+    let { location } = window
+    console.log('location', location)
+    if (/access_token|id_token|error/.test(location.hash)) {
+      this.setState({loading: true})
+      auth.handleAuthentication()
+        .then(() => this.setState({authed: true, loading: false}))
+        .catch(err => {
+          console.error(err)
+          this.setState({authed: false, loading: false})
+        })
+    } else {
+      this.setState({authed: false})
+    }
+  }
+
+  getAppMenu(props) {
+    console.log('routes', props)
+    const authed = this.state.authed
+
+    const authNav = authed ?
+      { title: 'Logout', linkProps: {onClick:()=>auth.logout()}, buttonProps: { color: 'secondary', variant: 'contained' } }
+      : { title: 'Login', linkProps: {onClick:()=>auth.login()}, buttonProps: { color: 'secondary', variant: 'contained' } };
+
+    return (
+      <div>
+        <Header
+          variant='center'
+          color='primary'
+          brand={{
+            title: 'Licensr',
+            variant: 'headline'
+          }}
+          appBarProps={{
+            position: 'fixed',
+          }}
+          navItems={[
+            { title: 'Uniforms', to: '/uniforms' },
+            authNav
+          ]}
+        />
+        {props.children}
+      </div>
+    )
+  }
+
+  getForm() {
     Survey.Survey.cssType = "bootstrap";
     var model = new Survey.Model(this.state.json)
     return (
@@ -69,9 +153,11 @@ class App extends Component {
         <div className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to React with SurveyJS</h2>
-          <button onClick={() => this.setState({json: waco})}>waco</button>
+          {/*<button onClick={() => this.setState({json: waco})}>waco</button>
           <button onClick={() => this.setState({json: columbus})}>columbus</button>
-          <button onClick={() => this.setState({json: pittsburgh})}>pittsburgh</button>
+          <button onClick={() => this.setState({json: pittsburgh})}>pittsburgh</button>*/}
+          {Object.keys(this.blocks).map(block => <button key={block} onClick={() => this.setState({ json: { pages: [ this.blocks[block] ] }})}>{block}</button>)}
+          
         </div>
         <div className="surveyjs">
           {/*If you want to show survey, uncomment the line below*/}
@@ -90,6 +176,21 @@ class App extends Component {
         </p>
       </div>
     );
+  }
+
+  getBody() {
+    console.log('state', this.state)
+    if (this.state.loading) {
+      return this.getLoading()
+    }
+    if (this.state.authed) {
+      return this.getForm()
+    }
+    return this.getLogin()
+  }
+
+  render() {
+    return this.getAppMenu({children: this.getBody()})
   }
 }
 
