@@ -235,3 +235,10 @@ export function mapDefaultValuesToPage (defaults, page) {
   page.elements = elements.map(recurse)
   return page
 }
+
+// TODO: map choices in block schema to choices constants.
+// example: OPTIONS_STATES in states block schema maps to States.getStatesArray
+
+
+// TODO: map array of validators in block schemas to validator constants
+// example: VALIDATORS_ZIP maps to zip from './validators'

@@ -9,3 +9,8 @@ export const ssn = {
   text: 'SSN',
   regex: '[0-9]{3}-[0-9]{2}-[0-9]{4}'
 }
+export const email = {
+  type: 'regex',
+  text: 'E-mail',
+  regex: '/.+@.+\..+/i'
+}
